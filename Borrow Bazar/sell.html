@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="List your items for sale or rent on Borrow Bazar and reach students across your campus easily.">
+    <title>Sell Items - Borrow Bazar</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="brand">
+    <div class="logo"></div>
+    <div class="name">borrowbazar</div>
+  </a>
+
+<nav id="navbar">
+<a href="index.html">Home</a>
+<a href="feedback.html">Feedback</a>
+<a href="sell.html">Sell</a>
+<a href="cart.html" id="cartCount">Cart (0)</a>
+<a href="orders.html">Orders</a>
+<a href="login.html" id="loginLink">Login</a>
+<a href="#" id="logoutLink" style="display:none" onclick="logout()">Logout</a>
+</nav>
+</header>
+
+<main>
+<div id="content" style="display:flex; flex-direction:column; align-items:center; padding-top:50px; height: auto; min-height: 600px;">
+    
+    <div class="white-box" style="width: 450px;">
+        <h2 style="text-align:center; margin-bottom:30px">List an Item</h2>
+
+        <div style="margin-bottom:15px">
+            <label style="display:block; margin-bottom:5px; font-weight:500">Product Name</label>
+            <input type="text" id="pName" placeholder="e.g. Hero Cycle" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd">
+        </div>
+
+        <div style="display:flex; gap:15px; margin-bottom:15px">
+            <div style="flex:1">
+                <label style="display:block; margin-bottom:5px; font-weight:500">Price (₹)</label>
+                <input type="number" id="pPrice" placeholder="500" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd">
+            </div>
+            <div style="flex:1">
+                <label style="display:block; margin-bottom:5px; font-weight:500">Category</label>
+                <select id="pCategory" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd">
+                    <option value="cycle">Cycle</option>
+                    <option value="book">Book</option>
+                    <option value="cloth">Cloth</option>
+                    <option value="notes">Notes</option>
+                    <option value="accessories">Accessories</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="margin-bottom:15px">
+            <label style="display:block; margin-bottom:5px; font-weight:500">Listing Type</label>
+            <select id="pType" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd">
+                <option value="buy">For Sale</option>
+                <option value="rent">For Rent</option>
+            </select>
+        </div>
+
+        <div style="margin-bottom:30px">
+            <label style="display:block; margin-bottom:5px; font-weight:500">Product Image</label>
+            <input type="file" id="pImage" style="width:100%">
+        </div>
+
+        <div style="text-align:center">
+            <button onclick="listProduct()" style="margin:0; width:100%">Post Item</button>
+        </div>
+    </div>
+
+</div>
+</main>
+
+<footer>
+    <div class="footer-content">
+    
+    <div class="foot-pannel1">
+      
+      <div class="logo"></div>
+      <h2>borrowbazar</h2>
+      <p>Buy | Sell | Rent</p>
+      <p>easily on campus</p>
+    </div>
+
+    <div class="foot-pannel2">
+      <h4>Quick Links</h4>
+      <p><a href="index.html">Home</a></p>
+      <p><a href="feedback.html">Feedback</a></p>
+    </div>
+
+    <div class="foot-pannel3">
+      <h4>Follow Us</h4>
+      <p><a href="https://www.instagram.com/borrowbazar" target="_blank">Instagram</a></p>
+      <p><a href="https://www.facebook.com/borrowbazar" target="_blank">Facebook</a></p>
+    
+    </div> 
+
+    <div class="foot-pannel4">
+      <h4>Contact Us</h4>
+      <p><a href="https://mail.google.com/mail/u/0/?fs=1&to=borrowbazar.iitp@gmail.com&su=Feedback&body=Hello,%20I%20would%20like%20to%20provide%20feedback%20about%20Borrow%20Bazar." target="_blank">Email</a></p>
+    </div>
+
+  </div>
+
+   <div class="foot-lower">
+    Borrow Bazar © 2026 | Made for Students
+ </div>
+</footer>
+
+<script src="js/script.js" defer></script>
+<script>
+async function listProduct() {
+    const token = localStorage.getItem("token");
+    if (!token) {
+        alert("Please login to sell items.");
+        window.location.href = "login.html";
+        return;
+    }
+
+    const name = document.getElementById("pName").value;
+    const price = document.getElementById("pPrice").value;
+    const category = document.getElementById("pCategory").value;
+    const type = document.getElementById("pType").value;
+    const file = document.getElementById("pImage").files[0];
+
+    if (!name || !price || !category) {
+        alert("Please fill all required fields");
+        return;
+    }
+
+    const productData = { name, price, category, type };
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = async function () {
+            productData.img = reader.result;
+            await submitProduct(productData, token);
+        };
+        reader.readAsDataURL(file);
+    } else {
+        productData.img = "images/logo.jpg"; // Default
+        await submitProduct(productData, token);
+    }
+}
+
+async function submitProduct(data, token) {
+    try {
+        const response = await fetch(`${API_URL}/products`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            alert("Product listed successfully!");
+            window.location.href = "index.html";
+        } else {
+            const err = await response.json();
+            alert(err.message || "Failed to list product");
+        }
+    } catch (err) {
+        console.error("List error:", err);
+        alert("Error connecting to server");
+    }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="description" content="View and manage your campus marketplace orders in your Borrow Bazar cart.">
+<title>Cart</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header>
+  <a href="index.html" class="brand">
+    <div class="logo"></div>
+    <div class="name">borrowbazar</div>
+  </a>
+
+<nav id="navbar">
+<a href="index.html">Home</a>
+<a href="feedback.html">Feedback</a>
+<a href="sell.html">Sell</a>
+<a href="cart.html" id="cartCount">Cart (0)</a>
+<a href="orders.html">Orders</a>
+<a href="login.html" id="loginLink">Login</a>
+<a href="#" id="logoutLink" style="display:none" onclick="logout()">Logout</a>
+</nav>
+</header>
+
+<main>
+<div id="content" style="min-height: 600px;">
+  
+  <h2 style="text-align:center;margin-top:30px;color:white">
+    Your Cart
+  </h2>
+  
+  <div id="cartItems">
+    <!-- Products will be loaded here -->
+  </div>
+
+  <div id="checkout" style="text-align:center;margin-bottom:50px;width:100%">
+    <button onclick="placeOrder()" style="background: #28a745; margin: 20px 0;">Place Order</button>
+  </div>
+
+</div>
+
+<!-- Checkout Modal -->
+<div id="orderModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; justify-content:center; align-items:center;">
+    <div style="background:white; padding:30px; border-radius:15px; width:400px; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+        <h3 style="margin-bottom:20px; text-align:center;">Delivery Details</h3>
+        
+        <div style="margin-bottom:15px;">
+            <label style="display:block; margin-bottom:5px; font-weight:500;">Hostel Name</label>
+            <input type="text" id="hostel" placeholder="e.g. CV Raman" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+        </div>
+
+        <div style="margin-bottom:15px;">
+            <label style="display:block; margin-bottom:5px; font-weight:500;">Room/Address</label>
+            <input type="text" id="address" placeholder="e.g. Room 302" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <label style="display:block; margin-bottom:5px; font-weight:500;">Phone Number</label>
+            <input type="tel" id="phone" maxlength="10" placeholder="9876543210" oninput="this.value = this.value.replace(/[^0-9]/g, '')" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd;">
+        </div>
+
+        <div style="display:flex; gap:10px;">
+            <button onclick="closeModal()" style="flex:1; background:#888; margin:0;">Cancel</button>
+            <button onclick="confirmOrder()" style="flex:1; background:#28a745; margin:0;">Confirm Order</button>
+        </div>
+    </div>
+</div>
+</main>
+
+<script src="js/script.js" defer></script>
+<script>
+
+function renderCart() {
+    let div = document.getElementById("cartItems")
+    div.innerHTML = ""
+
+    if (cart.length === 0) {
+        div.innerHTML = "<p style='color:white;text-align:center;width:100%'>Your cart is empty.</p>";
+        document.getElementById("checkout").style.display = "none";
+        return;
+    }
+
+    cart.forEach((item, index)=>{
+        div.innerHTML += `
+        <div class="product" style="position:relative">
+            <button onclick="removeFromCart(${index})" style="position:absolute; top:5px; right:5px; background:red; padding:2px 8px; font-size:12px; margin:0">X</button>
+            <img src="${item.img}" width="120" alt="${item.name}" loading="lazy">
+            <h3>${item.name}</h3>
+            <p>₹${item.price}</p>
+        </div>
+        `
+    })
+}
+
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    updateCartCounter();
+    renderCart();
+}
+
+function openModal() {
+    const token = localStorage.getItem("token");
+    if (!token) {
+        alert("Please login to place an order.");
+        window.location.href = "login.html";
+        return;
+    }
+    if (cart.length === 0) {
+        alert("Your cart is empty.");
+        return;
+    }
+    document.getElementById("orderModal").style.display = "flex";
+}
+
+function closeModal() {
+    document.getElementById("orderModal").style.display = "none";
+}
+
+async function confirmOrder() {
+    const hostel = document.getElementById("hostel").value;
+    const address = document.getElementById("address").value;
+    const phone = document.getElementById("phone").value;
+
+    if (!hostel || !address || !phone) {
+        alert("Please fill all delivery details.");
+        return;
+    }
+
+    if (phone.length !== 10) {
+        alert("Please enter a valid 10-digit phone number.");
+        return;
+    }
+
+    const details = `Hostel: ${hostel}, Address: ${address}, Phone: ${phone}`;
+    const token = localStorage.getItem("token");
+
+    try {
+        const response = await fetch(`${API_URL}/orders`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ products: cart, details: details })
+        });
+
+        if (response.ok) {
+            localStorage.removeItem("cart");
+            cart = []; // Reset local cart variable
+            updateCartCounter();
+            alert("Order Placed Successfully!");
+            window.location.href = "orders.html";
+        } else {
+            const data = await response.json();
+            alert(data.message || "Failed to place order.");
+        }
+    } catch (err) {
+        console.error("Order error:", err);
+        alert("An error occurred while placing the order.");
+    }
+}
+
+// Ensure scripts run after script.js has loaded
+document.addEventListener("DOMContentLoaded", () => {
+    renderCart();
+    
+    // Update the Place Order button to open the modal
+    const checkoutBtn = document.querySelector("#checkout button");
+    if (checkoutBtn) {
+        checkoutBtn.onclick = openModal;
+    }
+});
+
+
+</script>
+
+<footer>
+    <div class="footer-content">
+    
+    <div class="foot-pannel1">
+      
+      <div class="logo"></div>
+      <h2>borrowbazar</h2>
+      <p>Buy | Sell | Rent</p>
+      <p>easily on campus</p>
+    </div>
+
+    <div class="foot-pannel2">
+      <h4>Quick Links</h4>
+      <p><a href="index.html">Home</a></p>
+      <p><a href="feedback.html">Feedback</a></p>
+    </div>
+
+    <div class="foot-pannel3">
+      <h4>Follow Us</h4>
+      <p><a href="https://www.instagram.com/borrowbazar" target="_blank">Instagram</a></p>
+      <p><a href="https://www.facebook.com/borrowbazar" target="_blank">Facebook</a></p>
+    
+    </div> 
+
+    <div class="foot-pannel4">
+      <h4>Contact Us</h4>
+      <p><a href="https://mail.google.com/mail/u/0/?fs=1&to=borrowbazar.iitp@gmail.com&su=Feedback&body=Hello,%20I%20would%20like%20to%20provide%20feedback%20about%20Borrow%20Bazar." target="_blank">Email</a></p>
+    </div>
+
+  </div>
+
+   <div class="foot-lower">
+    Borrow Bazar © 2026 | Made for Students
+ </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="description" content="Borrow, buy, sell, and rent items like notes, books, clothes, accessories, and cycles easily on campus with Borrow Bazar.">
+<title>Borrow Bazar</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header>
+  <a href="index.html" class="brand">
+    <div class="logo"></div>
+    <div class="name">Borrowbazar</div>
+  </a>
+
+<nav id="navbar">
+<a href="index.html">Home</a>
+<a href="feedback.html">Feedback</a>
+<a href="sell.html">Sell</a>
+<a href="cart.html" id="cartCount">Cart (0)</a>
+<a href="orders.html">Orders</a>
+<a href="login.html" id="loginLink">Login</a>
+<a href="#" id="logoutLink" style="display:none" onclick="logout()">Logout</a>
+</nav>
+</header>
+
+<main>
+<section class="hero">
+
+<h1>Buy, Sell & Rent Easily On Campus</h1>
+
+<p>• Handwritten class notes  • Books  • Clothes  • Accesories  • Cycles</p>
+
+<div class="search-container" style="margin-top:20px">
+    <input type="text" id="search" placeholder="Search products..." style="padding:10px; width:300px; border-radius:5px; border:none;">
+    <button onclick="searchProducts()" style="padding:10px 20px; border-radius:5px; border:none; background:#ff9900; color:white; cursor:pointer;">Search</button>
+</div>
+
+</section>
+
+<section class="categories">
+
+
+<div class="card">
+<img src="images/notes.jpg" alt="Handwritten Notes">
+<h3>Handwritten Notes</h3>
+<button onclick="showProducts('notes')">Explore</button>
+</div>
+
+<div class="card">
+<img src="images/book1.jpg" alt="Books">
+<h3>Books</h3>
+<button onclick="showProducts('book')">Explore</button>
+</div>
+
+<div class="card">
+<img src="images/cloth1.jpg" alt="Clothes">
+<h3>Clothes</h3>
+<button onclick="showProducts('cloth')">Explore</button>
+</div>
+
+<div class="card">
+<img src="images/accessories1.jpg" alt="Accessories">
+<h3>Accessories</h3>
+<button onclick="showProducts('accessories')">Explore</button>
+</div>
+
+<div class="card">
+<img src="images/cycle1.jpg" alt="Cycles">
+<h3>Cycles</h3>
+<button onclick="showProducts('cycle')">Explore</button>
+</div>
+
+</section>
+
+<section id="products"></section>
+</main>
+
+ <footer>
+
+  <div class="footer-content">
+    
+    <div class="foot-pannel1">
+      
+      <div class="logo"></div>
+      <h2>borrowbazar</h2>
+      <p>Buy | Sell | Rent</p>
+      <p>easily on campus</p>
+    </div>
+
+    <div class="foot-pannel2">
+      <h4>Quick Links</h4>
+      <p><a href="index.html">Home</a></p>
+      <p><a href="feedback.html">Feedback</a></p>
+    </div>
+
+    <div class="foot-pannel3">
+      <h4>Follow Us</h4>
+      <p><a href="https://www.instagram.com/borrowbazar" target="_blank">Instagram</a></p>
+      <p><a href="https://www.facebook.com/borrowbazar" target="_blank">Facebook</a></p>
+    
+    </div> 
+
+    <div class="foot-pannel4">
+      <h4>Contact Us</h4>
+      <p><a href="https://mail.google.com/mail/u/0/?fs=1&to=borrowbazar.iitp@gmail.com&su=Feedback&body=Hello,%20I%20would%20like%20to%20provide%20feedback%20about%20Borrow%20Bazar." target="_blank">Email</a></p>
+    </div>
+
+  </div>
+
+   <div class="foot-lower">
+    Borrow Bazar © 2026 | Made for Students
+ </div>
+
+ </footer>
+
+<script src="js/script.js" defer></script>
+
+</body>
+
+</html>

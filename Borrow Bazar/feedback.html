@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Share your thoughts and suggestions to help us improve Borrow Bazar for the campus community.">
+    <title>Feedback - Borrow Bazar</title>
+    <link rel="stylesheet" href="css/style.css">
+
+<style>
+#popup{
+position:fixed;
+right:-400px;
+top:30px;
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 8px 20px rgba(0,0,0,0.3);
+width:320px;
+transition:0.5s;
+font-weight:500;
+z-index:1000;
+color: #333;
+border-left: 5px solid #28a745;
+}
+
+.showPopup{
+right:20px;
+}
+</style>
+
+</head>
+
+<body>
+
+<header>
+  <a href="index.html" class="brand">
+    <div class="logo"></div>
+    <div class="name">borrowbazar</div>
+  </a>
+
+<nav id="navbar">
+<a href="index.html">Home</a>
+<a href="feedback.html">Feedback</a>
+<a href="sell.html">Sell</a>
+<a href="cart.html" id="cartCount">Cart (0)</a>
+<a href="orders.html">Orders</a>
+<a href="login.html" id="loginLink">Login</a>
+<a href="#" id="logoutLink" style="display:none" onclick="logout()">Logout</a>
+</nav>
+</header>
+
+<main>
+<div id="content" style="min-height: 600px;">
+
+<section style="display:flex;justify-content:center;padding:80px">
+
+<div class="white-box" style="width:420px;">
+
+<h2 style="text-align:center;margin-bottom:20px">
+Send Feedback
+</h2>
+
+<input id="name" type="text" placeholder="Your Name"
+style="width:100%;padding:10px;margin-bottom:15px;border-radius:5px;border:1px solid #ddd">
+
+<input id="email" type="email" placeholder="Your Email"
+style="width:100%;padding:10px;margin-bottom:15px;border-radius:5px;border:1px solid #ddd">
+
+<textarea id="feedbackText" placeholder="Write your feedback..."
+style="width:100%;height:120px;padding:10px;margin-bottom:20px;border-radius:5px;border:1px solid #ddd"></textarea>
+
+<div style="text-align:center">
+<button onclick="submitFeedback()" style="width:100%;margin:0">
+Submit
+</button>
+</div>
+
+</div>
+
+</section>
+
+</div>
+</main>
+
+<div id="popup"></div>
+
+<footer>
+    <div class="footer-content">
+    
+    <div class="foot-pannel1">
+      
+      <div class="logo"></div>
+      <h2>borrowbazar</h2>
+      <p>Buy | Sell | Rent</p>
+      <p>easily on campus</p>
+    </div>
+
+    <div class="foot-pannel2">
+      <h4>Quick Links</h4>
+      <p><a href="index.html">Home</a></p>
+      <p><a href="feedback.html">Feedback</a></p>
+    </div>
+
+    <div class="foot-pannel3">
+      <h4>Follow Us</h4>
+      <p><a href="https://www.instagram.com/borrowbazar" target="_blank">Instagram</a></p>
+      <p><a href="https://www.facebook.com/borrowbazar" target="_blank">Facebook</a></p>
+    
+    </div> 
+
+    <div class="foot-pannel4">
+      <h4>Contact Us</h4>
+      <p><a href="https://mail.google.com/mail/u/0/?fs=1&to=borrowbazar.iitp@gmail.com&su=Feedback&body=Hello,%20I%20would%20like%20to%20provide%20feedback%20about%20Borrow%20Bazar." target="_blank">Email</a></p>
+    </div>
+
+  </div>
+
+   <div class="foot-lower">
+    Borrow Bazar © 2026 | Made for Students
+ </div>
+</footer>
+
+<script src="js/script.js" defer></script>
+<script>
+
+async function submitFeedback(){
+
+let name=document.getElementById("name").value
+let email=document.getElementById("email").value
+let message=document.getElementById("feedbackText").value
+
+if(name=="" || email=="" || message==""){
+alert("Please fill all fields")
+return
+}
+
+try {
+    const response = await fetch(`${API_URL}/feedback`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, message })
+    });
+
+    if (response.ok) {
+        let popup=document.getElementById("popup")
+        popup.innerHTML = `<b>Success!</b> Feedback submitted.`
+        popup.classList.add("showPopup")
+
+        setTimeout(function(){
+            popup.classList.remove("showPopup")
+        },4000)
+
+        document.getElementById("name").value=""
+        document.getElementById("email").value=""
+        document.getElementById("feedbackText").value=""
+    } else {
+        alert("Failed to submit feedback.");
+    }
+} catch (err) {
+    console.error("Feedback error:", err);
+    alert("An error occurred while submitting feedback.");
+}
+
+}
+
+</script>
+
+</body>
+</html>
